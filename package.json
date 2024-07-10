@@ -1,0 +1,18 @@
+{
+  "name": "tokobangunanaacashier",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "author": "Thoriq Hidayansyah",
+  "license": "ISC",
+  "dependencies": {
+    "@electron/remote": "^2.1.2",
+    "electron": "^31.0.2",
+    "imask": "^7.6.1",
+    "moment-timezone": "^0.5.45",
+    "sqlite3": "^5.1.7"
+  }
+}
