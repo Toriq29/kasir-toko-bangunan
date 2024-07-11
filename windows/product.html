@@ -56,7 +56,7 @@
                         <div class="row g-3">
                             <div class="col-auto">
                                 <button class="btn btn-sm btn-light btn-light-bordered" id="add-data" title="Tambah Data" onclick="openFormAddData()"><i class="fa fa-plus"></i></button>
-                                <button class="btn btn-sm btn-light btn-light-bordered"><i class="fa fa-trash"></i></button>
+                                <button class="btn btn-sm btn-light btn-light-bordered" onclick="deleteAction()" id="delete-multiple-data" data-bs-toggle="tooltip" title="Hapus"><i class="fa fa-trash"></i></button>
                                 <button class="btn btn-sm btn-light btn-light-bordered"><i class="fa fa-file-excel"></i></button>
                                 <button class="btn btn-sm btn-light btn-light-bordered"><i class="fa fa-file-pdf"></i></button>
                                 <button class="btn btn-sm btn-light btn-light-bordered"><i class="fa fa-print"></i></button>
@@ -112,26 +112,24 @@
                     <div class="col-auto">
                         <input type="text" class="form-control form-control-sm" placeholder="Nama Produk" id="product_name" required>
                     </div>
-                    <div class="col-auto">
+                    <!-- <div class="col-auto">
                         <input type="text" class="form-control form-control-sm" placeholder="Kode Produk" id="product_code" required>
-                    </div>
+                    </div> -->
                     <div class="col-auto">
                         <select name="" id="product_category" class="form-select form-select-sm" required>
-                            <option value="">Kategori</option>
-                            <option value="cat">Cat</option>
-                            <option value="semen">Semen</option>
                         </select>
                     </div>
                     <div class="col-auto">
                         <select name="" id="product_unit" class="form-select form-select-sm" required>
-                            <option value="">Satuan</option>
-                            <option value="kg">kg</option>
-                            <option value="kaleng">Kaleng</option>
-                            <option value="karung">Karung</option>
                         </select>
                     </div>
                     <div class="col-auto">
-                        <input type="text" class="form-control form-control-sm" placeholder="Lokasi" id="location" required>
+                        <select name="" id="location" class="form-select form-select-sm" required>
+                            <option value="">Lokasi</option>
+                            <option value="Toko">Toko</option>
+                            <option value="Gudang lt1">Gudang lt1</option>
+                            <option value="Gudang lt2">Gudang lt2</option>
+                        </select>
                     </div>
                     <div class="col-auto">
                         <input type="text" class="form-control form-control-sm" placeholder="Harga Beli" id="buy_price" required>
@@ -143,7 +141,7 @@
                     <div class="col-auto">
                         <input type="text" class="form-control form-control-sm" placeholder="Stok Awal" id="product_initial_stock" required >
                     </div>
-                    <div class="col-auto mt-3">
+                    <div class="col-auto">
                         <button class="btn btn-sm btn-primary" onclick="insertProduct()"><i class="fa fa-paper-plane"></i> Submit</button>
                         <button class="btn btn-sm btn-secondary" id="close-form-add-data" onclick="closeFormAddData()"><i class="fa fa-times"></i> Tutup</button>
                     </div>
@@ -159,6 +157,7 @@
                         <table class="table table-sm table-bordered" style="font-size: 13px;">
                             <thead class="table-light" id="col-head">
                                 <tr>
+                                    <th></th>
                                     <th>Tanggal Input/Edit</th>
                                     <th>Kode Produk</th>
                                     <th>Nama Produk</th>

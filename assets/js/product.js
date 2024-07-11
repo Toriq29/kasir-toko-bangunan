@@ -46,6 +46,9 @@ function loadProduct() {
             } else{
                 rows.forEach( (row) => {
                     tr += `<tr data-id=${row.id}>
+                        <td data-colname="Id">
+                            <input type="checkbox" id="${row.id}" class="data-checkbox">
+                        </td>
                         <td>${row.tanggal_input_edit}</td>
                         <td>${row.kode_produk}</td>
                         <td>${row.nama_produk}</td>
@@ -60,12 +63,13 @@ function loadProduct() {
                         <td>${row.stok_akhir}</td>
                         <td>
                             <button class="btn btn-sm btn-light btn-light-bordered"><i class="fa fa-edit"></i></button>
-                            <button class="btn btn-sm btn-danger"><i class="fa fa-trash"></i></button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteAction(${row.id}, '${row.nama_produk}')" id="delete-data"><i class="fa fa-trash"></i></button>
                         </td>
                     </tr>`
                 })
-                $('tbody#data').html(tr)
+                
             }
+            $('tbody#data').html(tr)
         })
     })
 }
@@ -99,7 +103,7 @@ insertProduct = () => {
         }
     })
 
-    if(required_array.length < 8){
+    if(required_array.length < 7){
         dialog.showMessageBoxSync({
             title: 'Alert',
             type: 'info',
@@ -113,9 +117,19 @@ insertProduct = () => {
                 if(res.row_number < 1){
                     db.run(`insert into produk(nama_produk, kode_produk, kategori, satuan, lokasi, harga_jual, harga_beli, stok_awal, produk_masuk, penjualan, stok_akhir) values('${nama_produk}','${kode_produk}','${kategori}','${satuan}','${lokasi}','${harga_jual}','${harga_beli}','${stok_awal}',0,0,'${stok_awal}');`, err => {
                         if(err) throw err
-                        blankForm()
-                        $('#product_name').focus()
-                        load_data()
+                        // generate kode produk
+                        db.each(`select id from produk where nama_produk = '${nama_produk}'`, (err, row) => {
+                            if(err) throw err
+                            db.run(`update produk set kode_produk = 'PR'||substr('000000'||${row.id},-6,6) where nama_produk = '${nama_produk}'`, err => {
+                                if(err) throw err
+                                blankForm()
+                                $('#product_name').focus()
+                                load_data()
+                            })
+                        })
+                        // blankForm()
+                        // $('#product_name').focus()
+                        // load_data()
                     })
                 }
                 else{
@@ -124,12 +138,32 @@ insertProduct = () => {
                         type: 'info',
                         message: 'Nama Produk sudah ada dalam database'
                     })
+                    blankForm()
                 }
             })
             
         })
     }
+}
 
+loadCategoryOption = () => {
+    db.all(`select * from kategori order by id desc`, (err,rows) => {
+        if(err) throw err
+        let option = '<option value="">Kategori</option>'
+        rows.map( (row) => {
+            option+=`<option value="${row.kategori}">${row.kategori}</option>`
+        })
+        $('#product_category').html(option)
+    })
+}
 
-
+loadUnitOption = () => {
+    db.all(`select * from satuan order by id desc`, (err,rows) => {
+        if(err) throw err
+        let option = '<option value="">Satuan</option>'
+        rows.map( (row) => {
+            option+=`<option value="${row.satuan}">${row.satuan}</option>`
+        })
+        $('#product_unit').html(option)
+    })
 }
