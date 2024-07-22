@@ -66,3 +66,20 @@ deleteMultipleRecords = (ids) => {
         }
     })
 }
+
+// checked box
+$('tbody#data').on('click', 'tr', function(){
+    let data_id = $(this).attr('data-id')
+    let checkBox = $('input[type="checkbox"]#'+data_id)
+    checkBox.prop('checked', !checkBox.prop("checked"))
+    $(this).toggleClass('blocked')
+})
+
+editRecord = (id) => {
+    let doc_id = $('body').attr('id')
+    switch (doc_id) {
+        case 'product-data':
+            editPrdData(id)
+            break;
+    }
+}

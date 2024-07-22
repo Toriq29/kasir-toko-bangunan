@@ -1,4 +1,3 @@
-
 let inputSellPrice = IMask(
     document.getElementById('sell_price'),
     {
@@ -47,7 +46,7 @@ function loadProduct() {
                 rows.forEach( (row) => {
                     tr += `<tr data-id=${row.id}>
                         <td data-colname="Id">
-                            <input type="checkbox" id="${row.id}" class="data-checkbox">
+                            <input type="checkbox" style="visibility:hidden" id="${row.id}" class="data-checkbox">
                         </td>
                         <td>${row.tanggal_input_edit}</td>
                         <td>${row.kode_produk}</td>
@@ -62,7 +61,7 @@ function loadProduct() {
                         <td>${row.penjualan}</td>
                         <td>${row.stok_akhir}</td>
                         <td>
-                            <button class="btn btn-sm btn-light btn-light-bordered"><i class="fa fa-edit"></i></button>
+                            <button class="btn btn-sm btn-light btn-light-bordered" onclick="editRecord(${row.id})" id="edit-data" ><i class="fa fa-edit"></i></button>
                             <button class="btn btn-sm btn-danger" onclick="deleteAction(${row.id}, '${row.nama_produk}')" id="delete-data"><i class="fa fa-trash"></i></button>
                         </td>
                     </tr>`
@@ -118,18 +117,18 @@ insertProduct = () => {
                     db.run(`insert into produk(nama_produk, kode_produk, kategori, satuan, lokasi, harga_jual, harga_beli, stok_awal, produk_masuk, penjualan, stok_akhir) values('${nama_produk}','${kode_produk}','${kategori}','${satuan}','${lokasi}','${harga_jual}','${harga_beli}','${stok_awal}',0,0,'${stok_awal}');`, err => {
                         if(err) throw err
                         // generate kode produk
-                        db.each(`select id from produk where nama_produk = '${nama_produk}'`, (err, row) => {
-                            if(err) throw err
-                            db.run(`update produk set kode_produk = 'PR'||substr('000000'||${row.id},-6,6) where nama_produk = '${nama_produk}'`, err => {
-                                if(err) throw err
-                                blankForm()
-                                $('#product_name').focus()
-                                load_data()
-                            })
-                        })
-                        // blankForm()
-                        // $('#product_name').focus()
-                        // load_data()
+                        // db.each(`select id from produk where nama_produk = '${nama_produk}'`, (err, row) => {
+                        //     if(err) throw err
+                        //     db.run(`update produk set kode_produk = 'PR'||substr('000000'||${row.id},-6,6) where nama_produk = '${nama_produk}'`, err => {
+                        //         if(err) throw err
+                        //         blankForm()
+                        //         $('#product_name').focus()
+                        //         load_data()
+                        //     })
+                        // })
+                        blankForm()
+                        $('#product_name').focus()
+                        load_data()
                     })
                 }
                 else{
@@ -165,5 +164,54 @@ loadUnitOption = () => {
             option+=`<option value="${row.satuan}">${row.satuan}</option>`
         })
         $('#product_unit').html(option)
+    })
+}
+
+editPrdData = (id) => {
+    let sqlUnits = `select * from satuan`
+    let sqlCategory = `select * from kategori`
+    let sql = `select * from produk where id = ${id}`
+
+    db.all(sqlUnits, (err, result) => {
+        if(err){
+            throw err
+        } else {
+            let unitOption
+            let unitOpts = '<option></option>'
+            result.forEach((item) => {
+                unitOpts += `<option value="${item.satuan}">${item.satuan}</option>`
+            })
+            unitOption = unitOpts
+            db.all(sqlCategory, (err, result) => {
+                if (err) {
+                    throw err
+                } else {
+                    let categoryOption
+                    let categoryOpts = '<option></option>'
+                    result.forEach((item) => {
+                        categoryOpts += `<option value="${item.kategori}">${item.kategori}</option>`
+                    })
+
+                    categoryOption = categoryOpts
+                    
+                    db.all(sql, (err, result) => {
+                        if (err) {
+                            throw err
+                        } else {
+                            let row = result[0]
+                            let editForm
+                            editForm =  `<div class="form-group">
+                                            <input type="text" value="${row.nama_produk}" id="editPrdName" placeholder="Nama Produk" class="form-control form-control-sm">
+                                            <input type="hidden" value="${row.nama_produk}" id="prevPrdName" >
+                                            <input type="hidden" value="${id}" id="rowId" >
+                                            </div>
+                                        `
+                            ipcRenderer.send('load:edit', 'product-data', editForm, 300, 450, id)
+                        }
+                    })
+                }
+            })
+        }
+
     })
 }

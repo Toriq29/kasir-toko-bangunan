@@ -58,3 +58,13 @@ function deleteAction(id=false, data=false) {
         }
     }
 }
+
+selectAll = () => {
+    $('input.data-checkbox').prop("checked", true)
+    $('tbody#data tr').addClass('blocked')
+}
+
+unselectAll = () => {
+    $('input.data-checkbox').prop("checked", false)
+    $('tbody#data tr').removeClass('blocked')
+}
