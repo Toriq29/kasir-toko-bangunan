@@ -83,3 +83,12 @@ editRecord = (id) => {
             break;
     }
 }
+
+alertSuccess = (msg) => {
+    let div = `<div class="alert alert-success">${msg}</div>`
+    $('#alert').html(div)
+    clearAlert = () => {
+        $('#alert').html("")
+    }
+    setTimeout(clearAlert, 4000)
+}

@@ -103,3 +103,11 @@ ipcMain.on('load:edit', (event, msgDocId, msgForm, msgWidth, msgHeight, msgRowId
     editData(msgDocId, msgForm, msgWidth, msgHeight, msgRowId)
 })
 
+
+ipcMain.on('update:success', (e, msgDocId) => {
+    switch (msgDocId) {
+        case 'product-data':
+            productWindow.webContents.send('update:success', 'Successfully updates product data')
+    }
+    editDataModal.close()
+})

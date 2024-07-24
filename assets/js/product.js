@@ -167,9 +167,36 @@ loadUnitOption = () => {
     })
 }
 
+loadLocationOption = () => {
+    db.all(`select * from lokasi order by id asc`, (err,rows) => {
+        if(err) throw err
+        let option = '<option value="">Lokasi</option>'
+        rows.map( (row) => {
+            option+=`<option value="${row.lokasi}">${row.lokasi}</option>`
+        })
+        $('#location').html(option)
+    })
+}
+
+function selectUnitOption(unitOpt, unit) {
+    let options = unitOpt.replace(`value="${unit}">`, `value="${unit}" selected>`)
+    return options
+}
+
+function selectCategoryOption(categoryOpt, category) {
+    let options = categoryOpt.replace(`value="${category}">`, `value="${category}" selected>`)
+    return options
+}
+
+function selectLocationOption(locationOpt, location) {
+    let options = locationOpt.replace(`value="${location}">`, `value="${location}" selected>`)
+    return options
+}
+
 editPrdData = (id) => {
     let sqlUnits = `select * from satuan`
     let sqlCategory = `select * from kategori`
+    let sqlLocation = `select * from lokasi`
     let sql = `select * from produk where id = ${id}`
 
     db.all(sqlUnits, (err, result) => {
@@ -193,20 +220,75 @@ editPrdData = (id) => {
                     })
 
                     categoryOption = categoryOpts
-                    
-                    db.all(sql, (err, result) => {
+
+                    db.all(sqlLocation, (err, result) => {
                         if (err) {
                             throw err
                         } else {
-                            let row = result[0]
-                            let editForm
-                            editForm =  `<div class="form-group">
-                                            <input type="text" value="${row.nama_produk}" id="editPrdName" placeholder="Nama Produk" class="form-control form-control-sm">
-                                            <input type="hidden" value="${row.nama_produk}" id="prevPrdName" >
-                                            <input type="hidden" value="${id}" id="rowId" >
-                                            </div>
-                                        `
-                            ipcRenderer.send('load:edit', 'product-data', editForm, 300, 450, id)
+                            let locationOption
+                            let locationOpts = '<option></option>'
+                            result.forEach((item) => {
+                                locationOpts += `<option value="${item.lokasi}">${item.lokasi}</option>`
+                            })
+
+                            locationOption = locationOpts
+
+                            db.all(sql, (err, result) => {
+                                if (err) {
+                                    throw err
+                                } else {
+                                    let row = result[0]
+                                    let editForm
+                                    editForm =  `
+                                                <div class="mb-3">
+                                                    <input type="text" value="${row.nama_produk}" id="editPrdName" placeholder="Nama Produk" class="form-control form-control-sm">
+                                                    <input type="hidden" value="${row.nama_produk}" id="prevPrdName" >
+                                                    <input type="hidden" value="${id}" id="rowId" >
+                                                </div>
+                                                <div class="mb-3">
+                                                    <input type="text" value="${row.kode_produk}" id="editPrdCode" placeholder="Kode Produk" class="form-control form-control-sm">
+                                                    <input type="hidden" value="${row.kode_produk}" id="prevPrdCode" >
+                                                </div>
+                                                <div class="mb-3">
+                                                    <select id="editPrdCategory" class="form-select form-select-sm ">
+                                                        ${selectCategoryOption(categoryOption, row.kategori)}
+                                                    </select>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <select id="editPrdUnit" class="form-select form-select-sm ">
+                                                        ${selectUnitOption(unitOption, row.satuan)}
+                                                    </select>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <select id="editPrdLocation" class="form-select form-select-sm ">
+                                                    ${selectLocationOption(locationOption, row.lokasi)}
+                                                    </select>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <input type="text" value="${row.harga_beli}" id="editPrdBuyPrice" placeholder="Harga Beli" class="form-control form-control-sm">
+                                                    <input type="hidden" value="${row.harga_beli}" id="prevPrdBuyPrice" >
+                                                </div>
+                                                <div class="mb-3">
+                                                    <input type="text" value="${row.harga_jual}" id="editPrdSellPrice" placeholder="Harga Jual" class="form-control form-control-sm">
+                                                    <input type="hidden" value="${row.harga_jual}" id="prevPrdSellPrice" >
+                                                </div>
+                                                <div class="mb-3">
+                                                    <input type="text" value="${row.stok_awal}" id="editPrdInitialStock" placeholder="Stok AWal" class="form-control form-control-sm">
+                                                    <input type="hidden" value="${row.stok_awal}" id="prevPrdInitialStock" >
+                                                </div>
+                                                <div class="mb-3">
+                                                    <input type="text" value="${row.produk_masuk}" id="editPrdIncomingStock" placeholder="Produk Masuk" class="form-control form-control-sm">
+                                                    <input type="hidden" value="${row.produk_masuk}" id="prevPrdIncomingStock" >
+                                                </div>
+                                                <div class="d-grid gap-2">
+                                                    <button class="btn btn-sm btn-primary btn-block" onclick="submitEditPrdData(${id})" id="btn-submit-edit">
+                                                        <i class="fa fa-paper-plane"></i>Submit
+                                                    </button>
+                                                </div>
+                                                `
+                                    ipcRenderer.send('load:edit', 'product-data', editForm, 300, 530, id)
+                                }
+                            })
                         }
                     })
                 }
@@ -215,3 +297,9 @@ editPrdData = (id) => {
 
     })
 }
+
+
+ipcRenderer.on('update:success', (e, msg) => {
+    alertSuccess(msg)
+    load_data()
+})

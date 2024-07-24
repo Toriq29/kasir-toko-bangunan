@@ -3,6 +3,7 @@ openFormAddData = () => {
     $('#product_name').focus()
     loadCategoryOption()
     loadUnitOption()
+    loadLocationOption()
 }
 
 
